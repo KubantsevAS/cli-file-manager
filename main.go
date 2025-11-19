@@ -10,13 +10,22 @@ import (
 )
 
 func main() {
-	fmt.Println(color.Error("Welcome to the File Manager, Username!"))
+	defer func() {
+		fmt.Println(color.Success("\nThank you for using File Manager, Username, goodbye!"))
+	}()
+
+	fmt.Println(color.Success("Welcome to the File Manager, Username!"))
 	scanner := bufio.NewScanner(os.Stdin)
 
 	for {
 		var cmdLine string
+		currentDir, err := os.Getwd()
 
-		fmt.Print("Enter command: ")
+		if err != nil {
+			panic(err.Error())
+		}
+
+		fmt.Printf("%s$ ", color.Info(currentDir))
 		scanner.Scan()
 		cmdLine = scanner.Text()
 
