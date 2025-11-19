@@ -9,11 +9,7 @@ func NewLocalFS() *LocalFS {
 }
 
 func (fs *LocalFS) ChangeDirectory(path string) error {
-	return nil
-}
-
-func (fs *LocalFS) Up(dir string) error {
-	return nil
+	return os.Chdir(path)
 }
 
 func (fs *LocalFS) List(dir string) ([]os.DirEntry, error) {

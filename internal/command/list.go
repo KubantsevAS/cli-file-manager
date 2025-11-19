@@ -17,6 +17,7 @@ func NewListCommand(fs filesystem.FileSystem) *ListCommand {
 
 func (c *ListCommand) Execute(dir string) ([]os.DirEntry, error) {
 	files, err := c.FS.List(dir)
+
 	if err != nil {
 		return nil, err
 	}
