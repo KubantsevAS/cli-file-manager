@@ -3,8 +3,8 @@ package cmd
 import (
 	"fmt"
 
-	"cli/file-manager/filesystem"
 	"cli/file-manager/internal/command"
+	"cli/file-manager/internal/filesystem"
 )
 
 func ListCommand(dir string) error {

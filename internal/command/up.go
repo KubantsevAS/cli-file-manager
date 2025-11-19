@@ -1,6 +1,6 @@
 package command
 
-import "cli/file-manager/filesystem"
+import "cli/file-manager/internal/filesystem"
 
 type UpCommand struct {
 	FS filesystem.FileSystem

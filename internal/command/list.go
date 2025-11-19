@@ -4,7 +4,7 @@ import (
 	"os"
 	"sort"
 
-	"cli/file-manager/filesystem"
+	"cli/file-manager/internal/filesystem"
 )
 
 type ListCommand struct {
