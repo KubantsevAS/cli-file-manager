@@ -8,6 +8,10 @@ import (
 )
 
 func ListCommand(dir string) error {
+	if dir == "" {
+		dir = "."
+	}
+
 	fs := filesystem.NewLocalFS()
 	listCmd := command.NewListCommand(fs)
 
