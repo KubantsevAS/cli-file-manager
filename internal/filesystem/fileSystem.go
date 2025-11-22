@@ -1,6 +1,11 @@
 package filesystem
 
-import "os"
+import (
+	"bufio"
+	"fmt"
+	"io"
+	"os"
+)
 
 type LocalFS struct{}
 
@@ -18,6 +23,22 @@ func (fs *LocalFS) List(dir string) ([]os.DirEntry, error) {
 		return nil, err
 	}
 	return files, nil
+}
+
+func (fs *LocalFS) Read(path string, w io.Writer) error {
+	file, err := os.Open(path)
+	if err != nil {
+		return fmt.Errorf("failed to open file: %w", err)
+	}
+	defer file.Close()
+
+	reader := bufio.NewReader(file)
+	_, err = io.Copy(w, reader)
+	if err != nil {
+		return fmt.Errorf("error reading file: %w", err)
+	}
+
+	return nil
 }
 
 func (fs *LocalFS) Copy(src, dst string) error {

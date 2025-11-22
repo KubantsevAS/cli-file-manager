@@ -44,6 +44,10 @@ func main() {
 				err := cmd.UpCommand()
 				return err
 			},
+			"cat": func() error {
+				err := cmd.ReadCommand(commandSlice[1])
+				return err
+			},
 		}
 
 		executor := commandMap[commandSlice[0]]
