@@ -7,10 +7,6 @@ import (
 )
 
 func DeleteCommand(path string) error {
-	if path == "" {
-		return fmt.Errorf("file path is required")
-	}
-
 	fs := filesystem.NewLocalFS()
 	deleteCmd := command.NewDeleteCommand(fs)
 

@@ -72,9 +72,15 @@ func main() {
 			},
 			"add": func() error {
 				if len(commandSlice) < 2 {
-					return fmt.Errorf("rm: missing file name")
+					return fmt.Errorf("add: missing file name")
 				}
 				return cmd.AddFileCommand(commandSlice[1])
+			},
+			"rn": func() error {
+				if len(commandSlice) < 3 {
+					return fmt.Errorf("rn: missing file path or new name")
+				}
+				return cmd.RenameCommand(commandSlice[1], commandSlice[2])
 			},
 		}
 

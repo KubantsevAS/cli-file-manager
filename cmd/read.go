@@ -9,10 +9,6 @@ import (
 )
 
 func ReadCommand(path string) error {
-	if path == "" {
-		return fmt.Errorf("file path is required")
-	}
-
 	fs := filesystem.NewLocalFS()
 	readCmd := command.NewReadCommand(fs)
 

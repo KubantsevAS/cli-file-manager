@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 )
 
 type LocalFS struct{}
@@ -74,8 +75,10 @@ func (fs *LocalFS) Move(src, dst string) error {
 	return nil
 }
 
-func (fs *LocalFS) Rename(prevName, newName string) error {
-	return nil
+func (fs *LocalFS) Rename(src, newName string) error {
+	srcDir := filepath.Dir(src)
+	dst := filepath.Join(srcDir, newName)
+	return os.Rename(src, dst)
 }
 
 func (fs *LocalFS) Delete(path string) error {

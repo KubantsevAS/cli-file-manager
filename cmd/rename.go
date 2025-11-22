@@ -5,9 +5,9 @@ import (
 	"cli/file-manager/internal/filesystem"
 )
 
-func AddFileCommand(name string) error {
+func RenameCommand(src, newName string) error {
 	fs := filesystem.NewLocalFS()
-	addFileCmd := command.NewAddFileCommand(fs)
+	renameCmd := command.NewRenameCommand(fs)
 
-	return addFileCmd.Execute(name)
+	return renameCmd.Execute(src, newName)
 }

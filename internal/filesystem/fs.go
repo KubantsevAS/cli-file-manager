@@ -13,6 +13,6 @@ type FileSystem interface {
 	AddFile(path string) error
 	Copy(src, dst string) error
 	Move(src, dst string) error
-	Rename(prevName, newName string) error
+	Rename(src, newName string) error
 	Delete(path string) error
 }

@@ -8,10 +8,6 @@ import (
 )
 
 func CreateDirCommand(name string) error {
-	if name == "" {
-		return fmt.Errorf("directory name is required")
-	}
-
 	fs := filesystem.NewLocalFS()
 	createDirCmd := command.NewCreateDirCommand(fs)
 
