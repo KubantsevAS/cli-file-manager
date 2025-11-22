@@ -47,9 +47,13 @@ func (fs *LocalFS) AddFile(path string) error {
 
 func (fs *LocalFS) CreateDir(name string) error {
 	err := os.Mkdir(name, 0755)
-	if err != nil && !os.IsExist(err) {
+	if err != nil {
+		if os.IsExist(err) {
+			return fmt.Errorf("directory already exists: %s", name)
+		}
 		return fmt.Errorf("failed to create directory: %w", err)
 	}
+
 	return nil
 }
 
