@@ -82,6 +82,18 @@ func main() {
 				}
 				return cmd.RenameCommand(commandSlice[1], commandSlice[2])
 			},
+			"cp": func() error {
+				if len(commandSlice) < 3 {
+					return fmt.Errorf("cp: missing file path or destination")
+				}
+				return cmd.CopyCommand(commandSlice[1], commandSlice[2])
+			},
+			"mv": func() error {
+				if len(commandSlice) < 3 {
+					return fmt.Errorf("mv: missing file path or destination")
+				}
+				return cmd.MoveCommand(commandSlice[1], commandSlice[2])
+			},
 		}
 
 		executor := commandMap[commandSlice[0]]
