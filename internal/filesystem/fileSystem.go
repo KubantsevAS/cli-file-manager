@@ -45,10 +45,6 @@ func (fs *LocalFS) Read(path string, w io.Writer) error {
 	return nil
 }
 
-func (fs *LocalFS) AddFile(path string) error {
-	return nil
-}
-
 func (fs *LocalFS) CreateDir(name string) error {
 	err := os.Mkdir(name, 0755)
 	if err != nil {
@@ -61,11 +57,24 @@ func (fs *LocalFS) CreateDir(name string) error {
 	return nil
 }
 
+func (fs *LocalFS) AddFile(name string) error {
+	file, err := os.Create(name)
+	if err != nil {
+		return fmt.Errorf("failed to create file %s: %w", name, err)
+	}
+	defer file.Close()
+	return nil
+}
+
 func (fs *LocalFS) Copy(src, dst string) error {
 	return nil
 }
 
 func (fs *LocalFS) Move(src, dst string) error {
+	return nil
+}
+
+func (fs *LocalFS) Rename(prevName, newName string) error {
 	return nil
 }
 

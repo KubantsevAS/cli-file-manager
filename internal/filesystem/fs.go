@@ -9,9 +9,10 @@ type FileSystem interface {
 	ChangeDir(path string) error
 	List(dir string) ([]os.DirEntry, error)
 	Read(path string, w io.Writer) error
-	AddFile(path string) error
 	CreateDir(name string) error
+	AddFile(path string) error
 	Copy(src, dst string) error
 	Move(src, dst string) error
+	Rename(prevName, newName string) error
 	Delete(path string) error
 }

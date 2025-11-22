@@ -70,6 +70,12 @@ func main() {
 				}
 				return cmd.DeleteCommand(commandSlice[1])
 			},
+			"add": func() error {
+				if len(commandSlice) < 2 {
+					return fmt.Errorf("rm: missing file name")
+				}
+				return cmd.AddFileCommand(commandSlice[1])
+			},
 		}
 
 		executor := commandMap[commandSlice[0]]
