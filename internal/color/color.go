@@ -21,6 +21,10 @@ const (
 	boldWhite  = "\033[1;37m"
 )
 
+func Folder(s string) string {
+	return yellow + s + reset
+}
+
 func Error(s string) string {
 	return boldRed + s + reset
 }

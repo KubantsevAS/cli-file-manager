@@ -5,9 +5,9 @@ import (
 	"cli/file-manager/internal/filesystem"
 )
 
-func UpCommand() error {
+func CopyCommand(src, dst string) error {
 	fs := filesystem.NewLocalFS()
-	upCmd := command.NewUpCommand(fs)
+	copyCmd := command.NewCopyCommand(fs)
 
-	return upCmd.Execute()
+	return copyCmd.Execute(src, dst)
 }

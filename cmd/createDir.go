@@ -5,9 +5,9 @@ import (
 	"cli/file-manager/internal/filesystem"
 )
 
-func UpCommand() error {
+func CreateDirCommand(name string) error {
 	fs := filesystem.NewLocalFS()
-	upCmd := command.NewUpCommand(fs)
+	createDirCmd := command.NewCreateDirCommand(fs)
 
-	return upCmd.Execute()
+	return createDirCmd.Execute(name)
 }
