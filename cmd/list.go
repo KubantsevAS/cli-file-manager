@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	"cli/file-manager/internal/color"
 	"cli/file-manager/internal/command"
 	"cli/file-manager/internal/filesystem"
 )
@@ -27,10 +28,12 @@ func ListCommand(dir string) error {
 	}
 
 	for _, file := range files {
+		name := file.Name()
+
 		if file.IsDir() {
-			fmt.Printf("./%s\n", file.Name())
+			fmt.Printf("📁 %s\n", color.Folder(name))
 		} else {
-			fmt.Println(file.Name())
+			fmt.Println(name)
 		}
 	}
 
