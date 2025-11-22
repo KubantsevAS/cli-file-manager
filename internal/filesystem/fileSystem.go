@@ -14,7 +14,11 @@ func NewLocalFS() *LocalFS {
 }
 
 func (fs *LocalFS) ChangeDir(path string) error {
-	return os.Chdir(path)
+	err := os.Chdir(path)
+	if err != nil {
+		return fmt.Errorf("failed to change directory to %s: %w", path, err)
+	}
+	return nil
 }
 
 func (fs *LocalFS) List(dir string) ([]os.DirEntry, error) {
@@ -28,14 +32,14 @@ func (fs *LocalFS) List(dir string) ([]os.DirEntry, error) {
 func (fs *LocalFS) Read(path string, w io.Writer) error {
 	file, err := os.Open(path)
 	if err != nil {
-		return fmt.Errorf("failed to open file: %w", err)
+		return fmt.Errorf("failed to open file %s: %w", path, err)
 	}
 	defer file.Close()
 
 	reader := bufio.NewReader(file)
 	_, err = io.Copy(w, reader)
 	if err != nil {
-		return fmt.Errorf("error reading file: %w", err)
+		return fmt.Errorf("failed to read file %s: %w", path, err)
 	}
 
 	return nil
@@ -49,9 +53,9 @@ func (fs *LocalFS) CreateDir(name string) error {
 	err := os.Mkdir(name, 0755)
 	if err != nil {
 		if os.IsExist(err) {
-			return fmt.Errorf("directory already exists: %s", name)
+			return fmt.Errorf("directory %s already exists", name)
 		}
-		return fmt.Errorf("failed to create directory: %w", err)
+		return fmt.Errorf("failed to create directory %s: %w", name, err)
 	}
 
 	return nil
@@ -66,5 +70,9 @@ func (fs *LocalFS) Move(src, dst string) error {
 }
 
 func (fs *LocalFS) Delete(path string) error {
+	err := os.Remove(path)
+	if err != nil {
+		return fmt.Errorf("failed to delete %s: %w", path, err)
+	}
 	return nil
 }

@@ -64,6 +64,12 @@ func main() {
 				}
 				return cmd.CreateDirCommand(commandSlice[1])
 			},
+			"rm": func() error {
+				if len(commandSlice) < 2 {
+					return fmt.Errorf("rm: missing file name")
+				}
+				return cmd.DeleteCommand(commandSlice[1])
+			},
 		}
 
 		executor := commandMap[commandSlice[0]]
