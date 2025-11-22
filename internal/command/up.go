@@ -11,5 +11,5 @@ func NewUpCommand(fs filesystem.FileSystem) *UpCommand {
 }
 
 func (c *UpCommand) Execute() error {
-	return c.FS.ChangeDirectory("..")
+	return c.FS.ChangeDir("..")
 }

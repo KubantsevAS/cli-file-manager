@@ -13,7 +13,7 @@ func NewLocalFS() *LocalFS {
 	return &LocalFS{}
 }
 
-func (fs *LocalFS) ChangeDirectory(path string) error {
+func (fs *LocalFS) ChangeDir(path string) error {
 	return os.Chdir(path)
 }
 
@@ -38,6 +38,18 @@ func (fs *LocalFS) Read(path string, w io.Writer) error {
 		return fmt.Errorf("error reading file: %w", err)
 	}
 
+	return nil
+}
+
+func (fs *LocalFS) AddFile(path string) error {
+	return nil
+}
+
+func (fs *LocalFS) CreateDir(name string) error {
+	err := os.Mkdir(name, 0755)
+	if err != nil && !os.IsExist(err) {
+		return fmt.Errorf("failed to create directory: %w", err)
+	}
 	return nil
 }
 

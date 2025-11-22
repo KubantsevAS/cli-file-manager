@@ -31,42 +31,60 @@ func main() {
 
 		commandSlice := strings.Fields(cmdLine)
 
+		if len(commandSlice) == 0 {
+			continue
+		}
+
 		commandMap := map[string]func() error{
 			"ls": func() error {
-				err := cmd.ListCommand(commandSlice[1])
-				return err
+				dir := ""
+				if len(commandSlice) > 1 {
+					dir = commandSlice[1]
+				}
+				return cmd.ListCommand(dir)
 			},
 			"cd": func() error {
-				err := cmd.ChangeDirectoryCommand(commandSlice[1])
-				return err
+				if len(commandSlice) < 2 {
+					return fmt.Errorf("cd: missing directory argument")
+				}
+				return cmd.ChangeDirCommand(commandSlice[1])
 			},
 			"up": func() error {
-				err := cmd.UpCommand()
-				return err
+				return cmd.UpCommand()
 			},
 			"cat": func() error {
-				err := cmd.ReadCommand(commandSlice[1])
-				return err
+				if len(commandSlice) < 2 {
+					return fmt.Errorf("cat: missing file argument")
+				}
+				return cmd.ReadCommand(commandSlice[1])
+			},
+			"mkdir": func() error {
+				if len(commandSlice) < 2 {
+					return fmt.Errorf("mkdir: missing directory name")
+				}
+				return cmd.CreateDirCommand(commandSlice[1])
 			},
 		}
 
 		executor := commandMap[commandSlice[0]]
 
 		if executor == nil {
-			fmt.Println("Invalid input")
+			fmt.Println(color.Error("Invalid input"))
 			continue
 		}
 
 		if err := executor(); err != nil {
-			fmt.Printf("Error: %v\n", err)
+			fmt.Printf("%s\n", color.Error(fmt.Sprintf("Error: %v", err)))
 			continue
 		}
 
-		switch cmdLine {
+		switch commandSlice[0] {
 		case "up":
 			fmt.Println("Moved up one directory")
 		case "cd":
-			fmt.Printf("Changed directory to: %s\n", commandSlice[1])
+			if len(commandSlice) > 1 {
+				fmt.Printf("Changed directory to: %s\n", commandSlice[1])
+			}
 		}
 	}
 }

@@ -7,9 +7,9 @@ import (
 	"cli/file-manager/internal/filesystem"
 )
 
-func ChangeDirectoryCommand(path string) error {
+func ChangeDirCommand(path string) error {
 	fs := filesystem.NewLocalFS()
-	changeDirectoryCmd := command.NewChangeDirectoryCommand(fs)
+	changeDirectoryCmd := command.NewChangeDirCommand(fs)
 
 	if err := changeDirectoryCmd.Execute(path); err != nil {
 		return fmt.Errorf("failed to change directory: %w", err)
