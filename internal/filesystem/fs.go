@@ -15,4 +15,5 @@ type FileSystem interface {
 	Move(src, dst string) error
 	Rename(src, newName string) error
 	Delete(path string) error
+	Hash(path string) (string, error)
 }

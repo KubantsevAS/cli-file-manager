@@ -70,5 +70,11 @@ func BuildCommandMap() map[string]CommandExecutor {
 		"os": func(args []string) error {
 			return cmd.OSCommand(append([]string{"os"}, args...))
 		},
+		"hash": func(args []string) error {
+			if len(args) < 1 {
+				return fmt.Errorf("hash: missing file name")
+			}
+			return cmd.HashCommand(args[0])
+		},
 	}
 }

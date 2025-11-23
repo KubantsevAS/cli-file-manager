@@ -2,6 +2,7 @@ package filesystem
 
 import (
 	"bufio"
+	"crypto/sha256"
 	"fmt"
 	"io"
 	"os"
@@ -145,4 +146,21 @@ func (fs *LocalFS) Delete(path string) error {
 		return fmt.Errorf("failed to delete %s: %w", path, err)
 	}
 	return nil
+}
+
+func (fs *LocalFS) Hash(path string) (string, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return "", fmt.Errorf("failed to open source file %s: %w", path, err)
+	}
+	defer file.Close()
+
+	hash := sha256.New()
+
+	if _, err := io.Copy(hash, file); err != nil {
+		return "", fmt.Errorf("failed to read file %s: %w", path, err)
+	}
+
+	hashSum := hash.Sum(nil)
+	return fmt.Sprintf("%x", hashSum), nil
 }
