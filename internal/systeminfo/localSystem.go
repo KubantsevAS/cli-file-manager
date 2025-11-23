@@ -3,7 +3,11 @@ package systeminfo
 import (
 	"fmt"
 	"os"
+	"os/user"
 	"runtime"
+	"strings"
+
+	"golang.org/x/sys/cpu"
 )
 
 type LocalSystem struct{}
@@ -21,20 +25,30 @@ func (s *LocalSystem) HomeDir() (string, error) {
 }
 
 func (s *LocalSystem) EOL() (string, error) {
-	// TODO: Implement EOL
-	return "", fmt.Errorf("EOL not yet implemented")
+	if runtime.GOOS == "windows" {
+		return "\\r\\n", nil
+	}
+	return "\\n", nil
 }
 
 func (s *LocalSystem) CPUs() (string, error) {
-	// TODO: Implement CPUs
-	return "", fmt.Errorf("CPUs not yet implemented")
+	var cpuInfo strings.Builder
+	cpuInfo.WriteString(fmt.Sprintf("Overall amount of CPUs: %d\n", runtime.NumCPU()))
+	cpuInfo.WriteString(fmt.Sprintf("Operating System: %s\n", runtime.GOOS))
+	cpuInfo.WriteString(fmt.Sprintf("Supports AVX: %t\n", cpu.X86.HasAVX))
+	cpuInfo.WriteString(fmt.Sprintf("Supports SSE4.2: %t", cpu.X86.HasSSE42))
+
+	return cpuInfo.String(), nil
 }
 
 func (s *LocalSystem) Username() (string, error) {
-	// TODO: Implement Username
-	return "", fmt.Errorf("Username not yet implemented")
+	currentUser, err := user.Current()
+	if err != nil {
+		return "", fmt.Errorf("failed to get current user: %w", err)
+	}
+	return currentUser.Username, nil
 }
 
 func (s *LocalSystem) Architecture() (string, error) {
-	return runtime.GOARCH, nil
+	return fmt.Sprintf("Architecture: %s", runtime.GOARCH), nil
 }

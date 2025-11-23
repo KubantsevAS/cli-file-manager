@@ -23,32 +23,23 @@ func OSCommand(args []string) error {
 		return fmt.Errorf("os: %w", err)
 	}
 
+	sysInfo := systeminfo.NewLocalSystem()
+
 	flagHandlers := map[string]func() error{
 		"homedir": func() error {
-			sysInfo := systeminfo.NewLocalSystem()
-			homeDirCmd := command.NewHomeDirCommand(sysInfo)
-			homeDir, err := homeDirCmd.Execute()
-			if err != nil {
-				return fmt.Errorf("failed to get home directory: %w", err)
-			}
-			fmt.Println(color.Info(homeDir))
-			return nil
+			return executeCommand(command.NewHomeDirCommand(sysInfo))
 		},
 		"EOL": func() error {
-			// TODO: Implement EOL command
-			return fmt.Errorf("os: --EOL not yet implemented")
+			return executeCommand(command.NewEOLCommand(sysInfo))
 		},
 		"cpus": func() error {
-			// TODO: Implement CPUs command
-			return fmt.Errorf("os: --cpus not yet implemented")
+			return executeCommand(command.NewCPUsCommand(sysInfo))
 		},
 		"username": func() error {
-			// TODO: Implement username command
-			return fmt.Errorf("os: --username not yet implemented")
+			return executeCommand(command.NewUsernameCommand(sysInfo))
 		},
 		"architecture": func() error {
-			// TODO: Implement architecture command
-			return fmt.Errorf("os: --architecture not yet implemented")
+			return executeCommand(command.NewArchitectureCommand(sysInfo))
 		},
 	}
 
@@ -64,4 +55,17 @@ func OSCommand(args []string) error {
 	}
 
 	return fmt.Errorf("os: no flag specified")
+}
+
+type ExecutableCmd interface {
+	Execute() (string, error)
+}
+
+func executeCommand(cmd ExecutableCmd) error {
+	info, err := cmd.Execute()
+	if err != nil {
+		return err
+	}
+	fmt.Printf("%s\n", color.Info(info))
+	return nil
 }
