@@ -7,7 +7,7 @@ import (
 	"runtime"
 	"strings"
 
-	"golang.org/x/sys/cpu"
+	"github.com/shirou/gopsutil/v3/cpu"
 )
 
 type LocalSystem struct{}
@@ -32,13 +32,32 @@ func (s *LocalSystem) EOL() (string, error) {
 }
 
 func (s *LocalSystem) CPUs() (string, error) {
-	var cpuInfo strings.Builder
-	cpuInfo.WriteString(fmt.Sprintf("Overall amount of CPUs: %d\n", runtime.NumCPU()))
-	cpuInfo.WriteString(fmt.Sprintf("Operating System: %s\n", runtime.GOOS))
-	cpuInfo.WriteString(fmt.Sprintf("Supports AVX: %t\n", cpu.X86.HasAVX))
-	cpuInfo.WriteString(fmt.Sprintf("Supports SSE4.2: %t", cpu.X86.HasSSE42))
+	var cpuData strings.Builder
+	cpuInfo, err := cpu.Info()
+	if err != nil {
+		return "", fmt.Errorf("failed to get current user: %w", err)
+	}
 
-	return cpuInfo.String(), nil
+	numCPU := runtime.NumCPU()
+	cpuData.WriteString(fmt.Sprintf("Overall amount of CPUs: %d\n", numCPU))
+
+	switch {
+	case len(cpuInfo) == 1:
+		for i := range numCPU {
+			info := cpuInfo[0]
+			cpuData.WriteString(getCPUInfo(info, i))
+		}
+	case len(cpuInfo) > 1:
+		for i, info := range cpuInfo {
+			cpuData.WriteString(getCPUInfo(info, i))
+		}
+	default:
+		for i := 0; i < numCPU; i++ {
+			cpuData.WriteString(fmt.Sprintf("CPU %d: (model information not available)\n", i+1))
+		}
+	}
+
+	return cpuData.String(), nil
 }
 
 func (s *LocalSystem) Username() (string, error) {
@@ -51,4 +70,9 @@ func (s *LocalSystem) Username() (string, error) {
 
 func (s *LocalSystem) Architecture() (string, error) {
 	return fmt.Sprintf("Architecture: %s", runtime.GOARCH), nil
+}
+
+func getCPUInfo(info cpu.InfoStat, number int) string {
+	clockGHz := float64(info.Mhz) / 1000.0
+	return fmt.Sprintf("CPU %d: Model=%s, Clock Rate=%.2f GHz\n", number+1, info.ModelName, clockGHz)
 }
