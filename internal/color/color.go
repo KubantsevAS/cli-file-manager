@@ -40,3 +40,7 @@ func Warning(s string) string {
 func Info(s string) string {
 	return boldCyan + s + reset
 }
+
+func ResultInfo(s string) string {
+	return cyan + s + reset
+}

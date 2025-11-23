@@ -10,11 +10,16 @@ import (
 )
 
 func main() {
+	userName := "Anonymous"
+
+	goodbyeMsg := fmt.Sprintf("\nThank you for using File Manager, %s, goodbye!", userName)
+	greetingMsg := fmt.Sprintf("Welcome to the File Manager, %s!", userName)
+
 	defer func() {
-		fmt.Println(color.Success("\nThank you for using File Manager, Username, goodbye!"))
+		fmt.Println(color.Success(goodbyeMsg))
 	}()
 
-	fmt.Println(color.Success("Welcome to the File Manager, Username!"))
+	fmt.Println(color.Success(greetingMsg))
 	scanner := bufio.NewScanner(os.Stdin)
 	commandMap := router.BuildCommandMap()
 

@@ -23,7 +23,7 @@ func ListCommand(dir string) error {
 	}
 
 	if len(files) == 0 {
-		fmt.Println(color.Info("Directory is empty"))
+		fmt.Println(color.ResultInfo("Directory is empty"))
 		return nil
 	}
 

@@ -17,6 +17,6 @@ func HashCommand(path string) error {
 		return err
 	}
 
-	fmt.Println(color.Info(hash))
+	fmt.Println(color.ResultInfo(hash))
 	return nil
 }
