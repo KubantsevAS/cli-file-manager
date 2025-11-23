@@ -94,6 +94,9 @@ func main() {
 				}
 				return cmd.MoveCommand(commandSlice[1], commandSlice[2])
 			},
+			"os": func() error {
+				return cmd.OSCommand(commandSlice)
+			},
 		}
 
 		executor := commandMap[commandSlice[0]]
