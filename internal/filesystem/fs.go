@@ -16,4 +16,6 @@ type FileSystem interface {
 	Rename(src, newName string) error
 	Delete(path string) error
 	Hash(path string) (string, error)
+	Compress(src, dst string) (string, error)
+	Decompress(path, dst string) (string, error)
 }

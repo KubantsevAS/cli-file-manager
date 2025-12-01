@@ -2,6 +2,7 @@ package filesystem
 
 import (
 	"bufio"
+	"compress/gzip"
 	"crypto/sha256"
 	"fmt"
 	"io"
@@ -13,6 +14,25 @@ type LocalFS struct{}
 
 func NewLocalFS() *LocalFS {
 	return &LocalFS{}
+}
+
+func ensureRegularFile(path string) (os.FileInfo, error) {
+	info, err := os.Stat(path)
+	if err != nil {
+		return nil, fmt.Errorf("failed to stat source file %s: %w", path, err)
+	}
+	if info.IsDir() {
+		return nil, fmt.Errorf("source %s is a directory, not a file", path)
+	}
+	return info, nil
+}
+
+func resolveDestinationPath(src, dst string) string {
+	finalDst := dst
+	if dstInfo, err := os.Stat(dst); err == nil && dstInfo.IsDir() {
+		finalDst = filepath.Join(dst, filepath.Base(src))
+	}
+	return finalDst
 }
 
 func (fs *LocalFS) ChangeDir(path string) error {
@@ -69,18 +89,12 @@ func (fs *LocalFS) AddFile(name string) error {
 }
 
 func (fs *LocalFS) Copy(src, dst string) error {
-	srcInfo, err := os.Stat(src)
+	srcInfo, err := ensureRegularFile(src)
 	if err != nil {
-		return fmt.Errorf("failed to stat source file %s: %w", src, err)
-	}
-	if srcInfo.IsDir() {
-		return fmt.Errorf("source %s is a directory, not a file", src)
+		return err
 	}
 
-	finalDst := dst
-	if dstInfo, err := os.Stat(dst); err == nil && dstInfo.IsDir() {
-		finalDst = filepath.Join(dst, filepath.Base(src))
-	}
+	finalDst := resolveDestinationPath(src, dst)
 
 	srcFile, err := os.Open(src)
 	if err != nil {
@@ -113,10 +127,7 @@ func (fs *LocalFS) Copy(src, dst string) error {
 }
 
 func (fs *LocalFS) Move(src, dst string) error {
-	finalDst := dst
-	if dstInfo, err := os.Stat(dst); err == nil && dstInfo.IsDir() {
-		finalDst = filepath.Join(dst, filepath.Base(src))
-	}
+	finalDst := resolveDestinationPath(src, dst)
 
 	if err := os.Rename(src, finalDst); err == nil {
 		return nil
@@ -163,4 +174,54 @@ func (fs *LocalFS) Hash(path string) (string, error) {
 
 	hashSum := hash.Sum(nil)
 	return fmt.Sprintf("%x", hashSum), nil
+}
+
+func (fs *LocalFS) Compress(src, dst string) (string, error) {
+	if _, err := ensureRegularFile(src); err != nil {
+		return "", err
+	}
+
+	finalDst := resolveDestinationPath(src, dst)
+
+	dstFile, err := os.Create(finalDst)
+	if err != nil {
+		return "", fmt.Errorf("failed to create destination file %s: %w", finalDst, err)
+	}
+	defer dstFile.Close()
+
+	srcFile, err := os.Open(src)
+	if err != nil {
+		return "", fmt.Errorf("failed to open source file %s: %w", src, err)
+	}
+
+	gzipWriter := gzip.NewWriter(dstFile)
+	if _, err = io.Copy(gzipWriter, srcFile); err != nil {
+		srcFile.Close()
+		gzipWriter.Close()
+		return "", fmt.Errorf("failed to compress file %s: %w", src, err)
+	}
+
+	if err := gzipWriter.Close(); err != nil {
+		srcFile.Close()
+		return "", fmt.Errorf("failed to finalize compression for %s: %w", src, err)
+	}
+
+	if err := srcFile.Close(); err != nil {
+		return "", fmt.Errorf("failed to close source file %s: %w", src, err)
+	}
+
+	if err := dstFile.Sync(); err != nil {
+		return "", fmt.Errorf("failed to sync destination file %s: %w", finalDst, err)
+	}
+
+	if err := fs.Delete(src); err != nil {
+		os.Remove(finalDst)
+		return "", fmt.Errorf("failed to delete source file %s after compression: %w", src, err)
+	}
+
+	return fmt.Sprintf("File %s successfully compressed to %s", src, dst), nil
+}
+
+func (fs *LocalFS) Decompress(path, dst string) (string, error) {
+	return "", nil
 }
