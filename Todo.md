@@ -41,8 +41,8 @@ go run main.go --username=your_username
   - [x] Get current _system user name_ and print it to console: `os --username`
   - [x] Get CPU architecture for which Go binary has compiled and print it to console: `os --architecture`
 
-- [ ] Calculate hash for file and print it into console: `hash path_to_file`
+- [x] Calculate hash for file and print it into console: `hash path_to_file`
   
-- [ ] Compress and decompress operations:
-  - [ ] Compress file: `compress path_to_file path_to_destination`
-  - [ ] Decompress file: `decompress path_to_file path_to_destination`
+- [x] Compress and decompress operations:
+  - [x] Compress file: `compress path_to_file path_to_destination`
+  - [x] Decompress file: `decompress path_to_file path_to_destination`
