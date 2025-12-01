@@ -14,7 +14,7 @@ func BuildCommandMap() map[string]CommandExecutor {
 			if len(args) > 0 {
 				dir = args[0]
 			}
-			return "", cmd.ListCommand(dir)
+			return cmd.ListCommand(dir)
 		},
 		"cd": func(args []string) (string, error) {
 			if len(args) < 1 {
@@ -41,7 +41,7 @@ func BuildCommandMap() map[string]CommandExecutor {
 			if len(args) < 1 {
 				return "", fmt.Errorf("rm: missing file name")
 			}
-			return "", cmd.DeleteCommand(args[0])
+			return cmd.DeleteCommand(args[0])
 		},
 		"add": func(args []string) (string, error) {
 			if len(args) < 1 {
@@ -53,19 +53,19 @@ func BuildCommandMap() map[string]CommandExecutor {
 			if len(args) < 2 {
 				return "", fmt.Errorf("rn: missing file path or new name")
 			}
-			return "", cmd.RenameCommand(args[0], args[1])
+			return cmd.RenameCommand(args[0], args[1])
 		},
 		"cp": func(args []string) (string, error) {
 			if len(args) < 2 {
 				return "", fmt.Errorf("cp: missing file path or destination")
 			}
-			return "", cmd.CopyCommand(args[0], args[1])
+			return cmd.CopyCommand(args[0], args[1])
 		},
 		"mv": func(args []string) (string, error) {
 			if len(args) < 2 {
 				return "", fmt.Errorf("mv: missing file path or destination")
 			}
-			return "", cmd.MoveCommand(args[0], args[1])
+			return cmd.MoveCommand(args[0], args[1])
 		},
 		"os": func(args []string) (string, error) {
 			return "", cmd.OSCommand(append([]string{"os"}, args...))

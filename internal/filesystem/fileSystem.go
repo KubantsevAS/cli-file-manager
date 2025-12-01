@@ -88,75 +88,81 @@ func (fs *LocalFS) AddFile(name string) (string, error) {
 	return fmt.Sprintf("Created new file '%s'", name), nil
 }
 
-func (fs *LocalFS) Copy(src, dst string) error {
+func (fs *LocalFS) Copy(src, dst string) (string, error) {
 	srcInfo, err := ensureRegularFile(src)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	finalDst := resolveDestinationPath(src, dst)
 
 	srcFile, err := os.Open(src)
 	if err != nil {
-		return fmt.Errorf("failed to open source file %s: %w", src, err)
+		return "", fmt.Errorf("failed to open source file %s: %w", src, err)
 	}
 	defer srcFile.Close()
 
 	dstFile, err := os.Create(finalDst)
 	if err != nil {
-		return fmt.Errorf("failed to create destination file %s: %w", finalDst, err)
+		return "", fmt.Errorf("failed to create destination file %s: %w", finalDst, err)
 	}
 	defer dstFile.Close()
 
 	_, err = io.Copy(dstFile, srcFile)
 	if err != nil {
-		return fmt.Errorf("failed to copy file from %s to %s: %w", src, finalDst, err)
+		return "", fmt.Errorf("failed to copy file from %s to %s: %w", src, finalDst, err)
 	}
 
 	err = os.Chmod(finalDst, srcInfo.Mode())
 	if err != nil {
-		return fmt.Errorf("failed to set permissions on destination file %s: %w", finalDst, err)
+		return "", fmt.Errorf("failed to set permissions on destination file %s: %w", finalDst, err)
 	}
 
 	err = dstFile.Sync()
 	if err != nil {
-		return fmt.Errorf("failed to sync destination file %s: %w", finalDst, err)
+		return "", fmt.Errorf("failed to sync destination file %s: %w", finalDst, err)
 	}
 
-	return nil
+	return fmt.Sprintf("File '%s' copied to '%s'", src, dst), nil
 }
 
-func (fs *LocalFS) Move(src, dst string) error {
+func (fs *LocalFS) Move(src, dst string) (string, error) {
+	successMsg := fmt.Sprintf("File '%s' moved to '%s'", src, dst)
 	finalDst := resolveDestinationPath(src, dst)
 
 	if err := os.Rename(src, finalDst); err == nil {
-		return nil
+		return successMsg, nil
 	}
 
-	if err := fs.Copy(src, finalDst); err != nil {
-		return err
+	if _, err := fs.Copy(src, finalDst); err != nil {
+		return "", err
 	}
 
-	if err := fs.Delete(src); err != nil {
+	if _, err := fs.Delete(src); err != nil {
 		os.Remove(finalDst)
-		return fmt.Errorf("failed to delete source file %s after copy: %w", src, err)
+		return "", fmt.Errorf("failed to delete source file %s after copy: %w", src, err)
 	}
 
-	return nil
+	return successMsg, nil
 }
 
-func (fs *LocalFS) Rename(src, newName string) error {
+func (fs *LocalFS) Rename(src, newName string) (string, error) {
 	srcDir := filepath.Dir(src)
 	dst := filepath.Join(srcDir, newName)
-	return os.Rename(src, dst)
+
+	if err := os.Rename(src, dst); err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("File '%s' renamed to '%s'", src, dst), nil
 }
 
-func (fs *LocalFS) Delete(path string) error {
+func (fs *LocalFS) Delete(path string) (string, error) {
 	err := os.Remove(path)
 	if err != nil {
-		return fmt.Errorf("failed to delete %s: %w", path, err)
+		return "", fmt.Errorf("failed to delete %s: %w", path, err)
 	}
-	return nil
+	return fmt.Sprintf("File '%s' successfully deleted", path), nil
 }
 
 func (fs *LocalFS) Hash(path string) (string, error) {
@@ -214,7 +220,7 @@ func (fs *LocalFS) Compress(src, dst string) (string, error) {
 		return "", fmt.Errorf("failed to sync destination file %s: %w", finalDst, err)
 	}
 
-	if err := fs.Delete(src); err != nil {
+	if _, err := fs.Delete(src); err != nil {
 		os.Remove(finalDst)
 		return "", fmt.Errorf("failed to delete source file %s after compression: %w", src, err)
 	}

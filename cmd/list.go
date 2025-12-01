@@ -2,13 +2,14 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 
 	"cli/file-manager/internal/color"
 	"cli/file-manager/internal/command"
 	"cli/file-manager/internal/filesystem"
 )
 
-func ListCommand(dir string) error {
+func ListCommand(dir string) (string, error) {
 	if dir == "" {
 		dir = "."
 	}
@@ -19,23 +20,24 @@ func ListCommand(dir string) error {
 	files, err := listCmd.Execute(dir)
 
 	if err != nil {
-		return fmt.Errorf("failed to list directory: %w", err)
+		return "", err
 	}
 
 	if len(files) == 0 {
-		fmt.Println(color.Info("Directory is empty"))
-		return nil
+		return color.Info("Directory is empty"), nil
 	}
 
-	for _, file := range files {
+	dirContent := make([]string, len(files))
+
+	for idx, file := range files {
 		name := file.Name()
 
 		if file.IsDir() {
-			fmt.Printf("📁 %s\n", color.Folder(name))
+			dirContent[idx] = fmt.Sprintf("📁 %s\n", color.Folder(name))
 		} else {
-			fmt.Println(name)
+			dirContent[idx] = color.File(name) + "\n"
 		}
 	}
 
-	return nil
+	return strings.TrimRight(strings.Join(dirContent, ""), "\n"), nil
 }

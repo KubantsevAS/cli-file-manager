@@ -25,6 +25,10 @@ func Folder(s string) string {
 	return yellow + s + reset
 }
 
+func File(s string) string {
+	return white + s + reset
+}
+
 func CommandExecuted(s string) string {
 	return green + s + reset
 }

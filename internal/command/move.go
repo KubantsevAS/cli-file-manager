@@ -10,6 +10,6 @@ func NewMoveCommand(fs filesystem.FileSystem) *MoveCommand {
 	return &MoveCommand{FS: fs}
 }
 
-func (c *MoveCommand) Execute(src, dst string) error {
+func (c *MoveCommand) Execute(src, dst string) (string, error) {
 	return c.FS.Move(src, dst)
 }
