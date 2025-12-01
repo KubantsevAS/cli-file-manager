@@ -17,5 +17,5 @@ type FileSystem interface {
 	Delete(path string) (string, error)
 	Hash(path string) (string, error)
 	Compress(src, dst string) (string, error)
-	Decompress(path, dst string) (string, error)
+	Decompress(src, dst string) (string, error)
 }

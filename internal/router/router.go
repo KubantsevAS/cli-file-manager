@@ -78,9 +78,15 @@ func BuildCommandMap() map[string]CommandExecutor {
 		},
 		"compress": func(args []string) (string, error) {
 			if len(args) < 2 {
-				return "", fmt.Errorf("cp: missing file path or destination")
+				return "", fmt.Errorf("compress: missing file path or destination")
 			}
 			return cmd.CompressCommand(args[0], args[1])
+		},
+		"decompress": func(args []string) (string, error) {
+			if len(args) < 2 {
+				return "", fmt.Errorf("decompress: missing file path or destination")
+			}
+			return cmd.DecompressCommand(args[0], args[1])
 		},
 	}
 }

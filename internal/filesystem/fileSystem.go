@@ -182,7 +182,9 @@ func (fs *LocalFS) Hash(path string) (string, error) {
 	return fmt.Sprintf("%x", hashSum), nil
 }
 
-func (fs *LocalFS) Compress(src, dst string) (string, error) {
+type gzipTransform func(srcFile *os.File, dstFile *os.File) error
+
+func (fs *LocalFS) transformGzipFile(src, dst string, transform gzipTransform, operationName, successMsg string) (string, error) {
 	if _, err := ensureRegularFile(src); err != nil {
 		return "", err
 	}
@@ -200,16 +202,9 @@ func (fs *LocalFS) Compress(src, dst string) (string, error) {
 		return "", fmt.Errorf("failed to open source file %s: %w", src, err)
 	}
 
-	gzipWriter := gzip.NewWriter(dstFile)
-	if _, err = io.Copy(gzipWriter, srcFile); err != nil {
+	if err := transform(srcFile, dstFile); err != nil {
 		srcFile.Close()
-		gzipWriter.Close()
-		return "", fmt.Errorf("failed to compress file %s: %w", src, err)
-	}
-
-	if err := gzipWriter.Close(); err != nil {
-		srcFile.Close()
-		return "", fmt.Errorf("failed to finalize compression for %s: %w", src, err)
+		return "", fmt.Errorf("failed to %s file %s: %w", operationName, src, err)
 	}
 
 	if err := srcFile.Close(); err != nil {
@@ -222,12 +217,43 @@ func (fs *LocalFS) Compress(src, dst string) (string, error) {
 
 	if _, err := fs.Delete(src); err != nil {
 		os.Remove(finalDst)
-		return "", fmt.Errorf("failed to delete source file %s after compression: %w", src, err)
+		return "", fmt.Errorf("failed to delete source file %s after %s: %w", src, operationName, err)
 	}
 
-	return fmt.Sprintf("File %s successfully compressed to %s", src, dst), nil
+	return successMsg, nil
 }
 
-func (fs *LocalFS) Decompress(path, dst string) (string, error) {
-	return "", nil
+func (fs *LocalFS) Compress(src, dst string) (string, error) {
+	transform := func(srcFile *os.File, dstFile *os.File) error {
+		gzipWriter := gzip.NewWriter(dstFile)
+		defer gzipWriter.Close()
+
+		if _, err := io.Copy(gzipWriter, srcFile); err != nil {
+			return err
+		}
+
+		return gzipWriter.Close()
+	}
+
+	successMsg := fmt.Sprintf("File %s successfully compressed to %s", src, dst)
+	return fs.transformGzipFile(src, dst, transform, "compress", successMsg)
+}
+
+func (fs *LocalFS) Decompress(src, dst string) (string, error) {
+	transform := func(srcFile *os.File, dstFile *os.File) error {
+		gzipReader, err := gzip.NewReader(srcFile)
+		if err != nil {
+			return fmt.Errorf("failed to create gzip reader: %w", err)
+		}
+		defer gzipReader.Close()
+
+		if _, err := io.Copy(dstFile, gzipReader); err != nil {
+			return err
+		}
+
+		return gzipReader.Close()
+	}
+
+	successMsg := fmt.Sprintf("File %s successfully decompressed to %s", src, dst)
+	return fs.transformGzipFile(src, dst, transform, "decompress", successMsg)
 }
