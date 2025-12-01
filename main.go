@@ -4,22 +4,35 @@ import (
 	"bufio"
 	"cli/file-manager/internal/color"
 	"cli/file-manager/internal/router"
+	"flag"
 	"fmt"
 	"os"
 	"strings"
 )
 
 func main() {
-	userName := "Anonymous"
+	userName := flag.String("username", "Anonymous", "Weather format")
+	flag.Parse()
 
-	goodbyeMsg := fmt.Sprintf("\nThank you for using File Manager, %s, goodbye!", userName)
-	greetingMsg := fmt.Sprintf("Welcome to the File Manager, %s!", userName)
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		warningMsg := fmt.Sprintf("Warning: failed to get home directory: %v\n", err)
+		fmt.Printf("%s", color.Warning(warningMsg))
+	}
+
+	if err := os.Chdir(homeDir); err != nil {
+		warningMsg := fmt.Sprintf("Warning: failed to change to home directory: %v\n", err)
+		fmt.Printf("%s", color.Warning(warningMsg))
+	}
+
+	goodbyeMsg := fmt.Sprintf("\nThank you for using File Manager, %s, goodbye!", *userName)
+	greetingMsg := fmt.Sprintf("Welcome to the File Manager, %s!", *userName)
 
 	defer func() {
-		fmt.Println(color.Success(goodbyeMsg))
+		fmt.Println(color.IntroOutro(goodbyeMsg))
 	}()
 
-	fmt.Println(color.Success(greetingMsg))
+	fmt.Println(color.IntroOutro(greetingMsg))
 	scanner := bufio.NewScanner(os.Stdin)
 	commandMap := router.BuildCommandMap()
 
@@ -39,6 +52,10 @@ func main() {
 			continue
 		}
 
+		if command == ".exit" {
+			break
+		}
+
 		executor := commandMap[command]
 		if executor == nil {
 			fmt.Println(color.Error("Invalid input"))
@@ -48,11 +65,11 @@ func main() {
 		result, err := executor(args)
 
 		if err != nil {
-			fmt.Printf("%s\n", color.Error(fmt.Sprintf("Error: %v", err)))
+			fmt.Printf("%s\n", color.Error(fmt.Sprintf("Operation failed: %v", err)))
 			continue
 		}
 
-		fmt.Println(color.CommandExecuted(result))
+		fmt.Println(color.Success(result))
 	}
 }
 
