@@ -88,5 +88,8 @@ func BuildCommandMap() map[string]CommandExecutor {
 			}
 			return cmd.DecompressCommand(args[0], args[1])
 		},
+		"help": func(args []string) (string, error) {
+			return cmd.HelpCommand()
+		},
 	}
 }

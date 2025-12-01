@@ -33,6 +33,7 @@ func main() {
 	}()
 
 	fmt.Println(color.IntroOutro(greetingMsg))
+	fmt.Println(color.Info("Enter 'help' to get available commands info"))
 	scanner := bufio.NewScanner(os.Stdin)
 	commandMap := router.BuildCommandMap()
 
