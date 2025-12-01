@@ -57,7 +57,7 @@ func (s *LocalSystem) CPUs() (string, error) {
 		}
 	}
 
-	return cpuData.String(), nil
+	return strings.TrimRight(cpuData.String(), "\n"), nil
 }
 
 func (s *LocalSystem) Username() (string, error) {

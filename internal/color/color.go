@@ -25,6 +25,10 @@ func Folder(s string) string {
 	return yellow + s + reset
 }
 
+func CommandExecuted(s string) string {
+	return green + s + reset
+}
+
 func Error(s string) string {
 	return boldRed + s + reset
 }
@@ -37,10 +41,10 @@ func Warning(s string) string {
 	return boldYellow + s + reset
 }
 
-func Info(s string) string {
-	return boldCyan + s + reset
+func Path(s string) string {
+	return boldBlue + s + reset
 }
 
-func ResultInfo(s string) string {
-	return cyan + s + reset
+func Info(s string) string {
+	return boldCyan + s + reset
 }

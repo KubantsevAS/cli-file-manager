@@ -5,7 +5,7 @@ import (
 	"cli/file-manager/internal/filesystem"
 )
 
-func ChangeDirCommand(path string) error {
+func ChangeDirCommand(path string) (string, error) {
 	fs := filesystem.NewLocalFS()
 	changeDirectoryCmd := command.NewChangeDirCommand(fs)
 

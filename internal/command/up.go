@@ -10,6 +10,6 @@ func NewUpCommand(fs filesystem.FileSystem) *UpCommand {
 	return &UpCommand{FS: fs}
 }
 
-func (c *UpCommand) Execute() error {
+func (c *UpCommand) Execute() (string, error) {
 	return c.FS.ChangeDir("..")
 }

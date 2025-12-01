@@ -8,15 +8,14 @@ import (
 	"cli/file-manager/internal/filesystem"
 )
 
-func HashCommand(path string) error {
+func HashCommand(path string) (string, error) {
 	fs := filesystem.NewLocalFS()
 	hashCmd := command.NewHashCommand(fs)
 
 	hash, err := hashCmd.Execute(path)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	fmt.Println(color.ResultInfo(hash))
-	return nil
+	return fmt.Sprintf("File '%s' hash info:\n%s", path, color.Info(hash)), nil
 }

@@ -66,6 +66,6 @@ func executeCommand(cmd ExecutableCmd) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("%s\n", color.ResultInfo(info))
+	fmt.Print(color.Info(info))
 	return nil
 }

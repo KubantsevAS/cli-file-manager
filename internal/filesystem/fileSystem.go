@@ -35,12 +35,12 @@ func resolveDestinationPath(src, dst string) string {
 	return finalDst
 }
 
-func (fs *LocalFS) ChangeDir(path string) error {
+func (fs *LocalFS) ChangeDir(path string) (string, error) {
 	err := os.Chdir(path)
 	if err != nil {
-		return fmt.Errorf("failed to change directory to %s: %w", path, err)
+		return "", fmt.Errorf("failed to change directory to %s: %w", path, err)
 	}
-	return nil
+	return "Changed current directory", nil
 }
 
 func (fs *LocalFS) List(dir string) ([]os.DirEntry, error) {
@@ -51,41 +51,41 @@ func (fs *LocalFS) List(dir string) ([]os.DirEntry, error) {
 	return files, nil
 }
 
-func (fs *LocalFS) Read(path string, w io.Writer) error {
+func (fs *LocalFS) Read(path string, w io.Writer) (string, error) {
 	file, err := os.Open(path)
 	if err != nil {
-		return fmt.Errorf("failed to open file %s: %w", path, err)
+		return "", fmt.Errorf("failed to open file %s: %w", path, err)
 	}
 	defer file.Close()
 
 	reader := bufio.NewReader(file)
 	_, err = io.Copy(w, reader)
 	if err != nil {
-		return fmt.Errorf("failed to read file %s: %w", path, err)
+		return "", fmt.Errorf("failed to read file %s: %w", path, err)
 	}
 
-	return nil
+	return fmt.Sprintf("\nSuccessfully read file '%s' content", path), nil
 }
 
-func (fs *LocalFS) CreateDir(name string) error {
+func (fs *LocalFS) CreateDir(name string) (string, error) {
 	err := os.Mkdir(name, 0755)
 	if err != nil {
 		if os.IsExist(err) {
-			return fmt.Errorf("directory %s already exists", name)
+			return "", fmt.Errorf("directory %s already exists", name)
 		}
-		return fmt.Errorf("failed to create directory %s: %w", name, err)
+		return "", fmt.Errorf("failed to create directory %s: %w", name, err)
 	}
 
-	return nil
+	return fmt.Sprintf("Created new directory '%s'", name), nil
 }
 
-func (fs *LocalFS) AddFile(name string) error {
+func (fs *LocalFS) AddFile(name string) (string, error) {
 	file, err := os.Create(name)
 	if err != nil {
-		return fmt.Errorf("failed to create file %s: %w", name, err)
+		return "", fmt.Errorf("failed to create file %s: %w", name, err)
 	}
 	defer file.Close()
-	return nil
+	return fmt.Sprintf("Created new file '%s'", name), nil
 }
 
 func (fs *LocalFS) Copy(src, dst string) error {

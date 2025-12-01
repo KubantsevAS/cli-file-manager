@@ -10,6 +10,6 @@ func NewAddFileCommand(fs filesystem.FileSystem) *addFileCommand {
 	return &addFileCommand{FS: fs}
 }
 
-func (c *addFileCommand) Execute(name string) error {
+func (c *addFileCommand) Execute(name string) (string, error) {
 	return c.FS.AddFile(name)
 }

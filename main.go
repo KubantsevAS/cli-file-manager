@@ -29,7 +29,7 @@ func main() {
 			panic(err.Error())
 		}
 
-		fmt.Printf("\n%s$ ", color.Info(currentDir))
+		fmt.Printf("\n%s$ ", color.Path(currentDir))
 		if !scanner.Scan() {
 			break
 		}
@@ -45,9 +45,14 @@ func main() {
 			continue
 		}
 
-		if err := executor(args); err != nil {
+		result, err := executor(args)
+
+		if err != nil {
 			fmt.Printf("%s\n", color.Error(fmt.Sprintf("Error: %v", err)))
+			continue
 		}
+
+		fmt.Println(color.CommandExecuted(result))
 	}
 }
 
