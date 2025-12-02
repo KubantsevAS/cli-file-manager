@@ -2,122 +2,84 @@ package main
 
 import (
 	"bufio"
-	"cli/file-manager/cmd"
 	"cli/file-manager/internal/color"
+	"cli/file-manager/internal/router"
+	"flag"
 	"fmt"
 	"os"
 	"strings"
 )
 
 func main() {
+	userName := flag.String("username", "Anonymous", "Weather format")
+	flag.Parse()
+
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		warningMsg := fmt.Sprintf("Warning: failed to get home directory: %v\n", err)
+		fmt.Printf("%s", color.Warning(warningMsg))
+	}
+
+	if err := os.Chdir(homeDir); err != nil {
+		warningMsg := fmt.Sprintf("Warning: failed to change to home directory: %v\n", err)
+		fmt.Printf("%s", color.Warning(warningMsg))
+	}
+
+	goodbyeMsg := fmt.Sprintf("\nThank you for using File Manager, %s, goodbye!", *userName)
+	greetingMsg := fmt.Sprintf("Welcome to the File Manager, %s!", *userName)
+
 	defer func() {
-		fmt.Println(color.Success("\nThank you for using File Manager, Username, goodbye!"))
+		fmt.Println(color.IntroOutro(goodbyeMsg))
 	}()
 
-	fmt.Println(color.Success("Welcome to the File Manager, Username!"))
+	fmt.Println(color.IntroOutro(greetingMsg))
+	fmt.Println(color.Info("Enter 'help' to get available commands info"))
 	scanner := bufio.NewScanner(os.Stdin)
+	commandMap := router.BuildCommandMap()
 
 	for {
-		var cmdLine string
 		currentDir, err := os.Getwd()
-
 		if err != nil {
 			panic(err.Error())
 		}
 
-		fmt.Printf("%s$ ", color.Info(currentDir))
-		scanner.Scan()
-		cmdLine = scanner.Text()
+		fmt.Printf("\n%s$ ", color.Path(currentDir))
+		if !scanner.Scan() {
+			break
+		}
 
-		commandSlice := strings.Fields(cmdLine)
-
-		if len(commandSlice) == 0 {
+		command, args := parseCommand(strings.Fields(scanner.Text()))
+		if command == "" {
 			continue
 		}
 
-		commandMap := map[string]func() error{
-			"ls": func() error {
-				dir := ""
-				if len(commandSlice) > 1 {
-					dir = commandSlice[1]
-				}
-				return cmd.ListCommand(dir)
-			},
-			"cd": func() error {
-				if len(commandSlice) < 2 {
-					return fmt.Errorf("cd: missing directory argument")
-				}
-				return cmd.ChangeDirCommand(commandSlice[1])
-			},
-			"up": func() error {
-				return cmd.UpCommand()
-			},
-			"cat": func() error {
-				if len(commandSlice) < 2 {
-					return fmt.Errorf("cat: missing file argument")
-				}
-				return cmd.ReadCommand(commandSlice[1])
-			},
-			"mkdir": func() error {
-				if len(commandSlice) < 2 {
-					return fmt.Errorf("mkdir: missing directory name")
-				}
-				return cmd.CreateDirCommand(commandSlice[1])
-			},
-			"rm": func() error {
-				if len(commandSlice) < 2 {
-					return fmt.Errorf("rm: missing file name")
-				}
-				return cmd.DeleteCommand(commandSlice[1])
-			},
-			"add": func() error {
-				if len(commandSlice) < 2 {
-					return fmt.Errorf("add: missing file name")
-				}
-				return cmd.AddFileCommand(commandSlice[1])
-			},
-			"rn": func() error {
-				if len(commandSlice) < 3 {
-					return fmt.Errorf("rn: missing file path or new name")
-				}
-				return cmd.RenameCommand(commandSlice[1], commandSlice[2])
-			},
-			"cp": func() error {
-				if len(commandSlice) < 3 {
-					return fmt.Errorf("cp: missing file path or destination")
-				}
-				return cmd.CopyCommand(commandSlice[1], commandSlice[2])
-			},
-			"mv": func() error {
-				if len(commandSlice) < 3 {
-					return fmt.Errorf("mv: missing file path or destination")
-				}
-				return cmd.MoveCommand(commandSlice[1], commandSlice[2])
-			},
-			"os": func() error {
-				return cmd.OSCommand(commandSlice)
-			},
+		if command == ".exit" {
+			break
 		}
 
-		executor := commandMap[commandSlice[0]]
-
+		executor := commandMap[command]
 		if executor == nil {
 			fmt.Println(color.Error("Invalid input"))
 			continue
 		}
 
-		if err := executor(); err != nil {
-			fmt.Printf("%s\n", color.Error(fmt.Sprintf("Error: %v", err)))
+		result, err := executor(args)
+
+		if err != nil {
+			fmt.Printf("%s\n", color.Error(fmt.Sprintf("Operation failed: %v", err)))
 			continue
 		}
 
-		switch commandSlice[0] {
-		case "up":
-			fmt.Println("Moved up one directory")
-		case "cd":
-			if len(commandSlice) > 1 {
-				fmt.Printf("Changed directory to: %s\n", commandSlice[1])
-			}
-		}
+		fmt.Println(color.Success(result))
 	}
+}
+
+func parseCommand(cmdLine []string) (string, []string) {
+	if len(cmdLine) == 0 {
+		return "", []string{}
+	}
+	if len(cmdLine) == 1 {
+		return cmdLine[0], []string{}
+	}
+	return cmdLine[0], cmdLine[1:]
 }

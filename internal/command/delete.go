@@ -10,6 +10,6 @@ func NewDeleteCommand(fs filesystem.FileSystem) *DeleteCommand {
 	return &DeleteCommand{FS: fs}
 }
 
-func (c *DeleteCommand) Execute(path string) error {
+func (c *DeleteCommand) Execute(path string) (string, error) {
 	return c.FS.Delete(path)
 }

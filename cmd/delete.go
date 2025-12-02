@@ -5,7 +5,7 @@ import (
 	"cli/file-manager/internal/filesystem"
 )
 
-func DeleteCommand(path string) error {
+func DeleteCommand(path string) (string, error) {
 	fs := filesystem.NewLocalFS()
 	deleteCmd := command.NewDeleteCommand(fs)
 

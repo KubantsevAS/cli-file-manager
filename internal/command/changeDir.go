@@ -10,6 +10,6 @@ func NewChangeDirCommand(fs filesystem.FileSystem) *ChangeDirCommand {
 	return &ChangeDirCommand{FS: fs}
 }
 
-func (c *ChangeDirCommand) Execute(path string) error {
+func (c *ChangeDirCommand) Execute(path string) (string, error) {
 	return c.FS.ChangeDir(path)
 }

@@ -10,6 +10,6 @@ func NewCopyCommand(fs filesystem.FileSystem) *CopyCommand {
 	return &CopyCommand{FS: fs}
 }
 
-func (c *CopyCommand) Execute(src, dst string) error {
+func (c *CopyCommand) Execute(src, dst string) (string, error) {
 	return c.FS.Copy(src, dst)
 }

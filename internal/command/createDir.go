@@ -12,6 +12,6 @@ func NewCreateDirCommand(fs filesystem.FileSystem) *CreateDirCommand {
 	return &CreateDirCommand{FS: fs}
 }
 
-func (c *CreateDirCommand) Execute(name string) error {
+func (c *CreateDirCommand) Execute(name string) (string, error) {
 	return c.FS.CreateDir(name)
 }

@@ -14,6 +14,6 @@ func NewReadCommand(fs filesystem.FileSystem) *ReadCommand {
 	return &ReadCommand{FS: fs}
 }
 
-func (c *ReadCommand) Execute(path string, w io.Writer) error {
+func (c *ReadCommand) Execute(path string, w io.Writer) (string, error) {
 	return c.FS.Read(path, w)
 }

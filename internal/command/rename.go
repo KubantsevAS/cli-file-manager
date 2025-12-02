@@ -10,6 +10,6 @@ func NewRenameCommand(fs filesystem.FileSystem) *RenameCommand {
 	return &RenameCommand{FS: fs}
 }
 
-func (c *RenameCommand) Execute(src, newName string) error {
+func (c *RenameCommand) Execute(src, newName string) (string, error) {
 	return c.FS.Rename(src, newName)
 }

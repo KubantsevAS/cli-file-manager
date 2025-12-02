@@ -1,20 +1,15 @@
 # Todo
 
-- The program is started in the following way:
-
-```bash
-go run main.go --username=your_username
-```
-
-- [ ] After starting the program displays the following text in the console (`Username` is equal to value that was passed on application start in `--username` CLI argument)  
+- [x] The program is started in the following way: `go run main.go --username=your_username`
+- [x] After starting the program displays the following text in the console (`Username` is equal to value that was passed on application start in `--username` CLI argument)  
   `Welcome to the File Manager, Username!`
-- [ ] After program work finished (`ctrl + c` pressed or user sent `.exit` command into console) the program displays the following text in the console  
+- [x] After program work finished (`ctrl + c` pressed or user sent `.exit` command into console) the program displays the following text in the console  
   `Thank you for using File Manager, Username, goodbye!`
-- [ ] Starting working directory is current system user's home directory (for example, on Windows it's something like `system_drive/Users/Username`)
-- [ ] By default program should prompt user in console to print commands and wait for results
-- [ ] In case of unknown operation or invalid input (missing mandatory arguments, wrong data in arguments, etc.) `Invalid input` message should be shown and user should be able to enter another command
-- [ ] In case of error during execution of operation `Operation failed` message should be shown and user should be able to enter another command (e.g. attempt to perform an operation on a non-existent file or work on a non-existent path should result in the operation fail)
-- [ ] User can't go upper than root directory (e.g. on Windows it's current local drive root). If user tries to do so, current working directory doesn't change
+- [x] Starting working directory is current system user's home directory (for example, on Windows it's something like `system_drive/Users/Username`)
+- [x] By default program should prompt user in console to print commands and wait for results
+- [x] In case of unknown operation or invalid input (missing mandatory arguments, wrong data in arguments, etc.) `Invalid input` message should be shown and user should be able to enter another command
+- [x] In case of error during execution of operation `Operation failed` message should be shown and user should be able to enter another command (e.g. attempt to perform an operation on a non-existent file or work on a non-existent path should result in the operation fail)
+- [x] User can't go upper than root directory (e.g. on Windows it's current local drive root). If user tries to do so, current working directory doesn't change
 
 ## List of operations and their syntax
 
@@ -41,8 +36,9 @@ go run main.go --username=your_username
   - [x] Get current _system user name_ and print it to console: `os --username`
   - [x] Get CPU architecture for which Go binary has compiled and print it to console: `os --architecture`
 
-- [ ] Calculate hash for file and print it into console: `hash path_to_file`
+- [x] Calculate hash for file and print it into console: `hash path_to_file`
+- [x] Get list of all available commands: `help`
   
-- [ ] Compress and decompress operations:
-  - [ ] Compress file: `compress path_to_file path_to_destination`
-  - [ ] Decompress file: `decompress path_to_file path_to_destination`
+- [x] Compress and decompress operations:
+  - [x] Compress file: `compress path_to_file path_to_destination`
+  - [x] Decompress file: `decompress path_to_file path_to_destination`

@@ -5,7 +5,7 @@ import (
 	"cli/file-manager/internal/filesystem"
 )
 
-func CopyCommand(src, dst string) error {
+func CopyCommand(src, dst string) (string, error) {
 	fs := filesystem.NewLocalFS()
 	copyCmd := command.NewCopyCommand(fs)
 

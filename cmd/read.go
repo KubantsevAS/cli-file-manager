@@ -7,7 +7,7 @@ import (
 	"cli/file-manager/internal/filesystem"
 )
 
-func ReadCommand(path string) error {
+func ReadCommand(path string) (string, error) {
 	fs := filesystem.NewLocalFS()
 	readCmd := command.NewReadCommand(fs)
 
