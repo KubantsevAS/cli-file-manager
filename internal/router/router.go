@@ -68,7 +68,7 @@ func BuildCommandMap() map[string]CommandExecutor {
 			return cmd.MoveCommand(args[0], args[1])
 		},
 		"os": func(args []string) (string, error) {
-			return "", cmd.OSCommand(append([]string{"os"}, args...))
+			return cmd.OSCommand(append([]string{"os"}, args...))
 		},
 		"hash": func(args []string) (string, error) {
 			if len(args) < 1 {

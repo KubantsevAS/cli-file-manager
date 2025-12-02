@@ -9,7 +9,7 @@ import (
 	"cli/file-manager/internal/systeminfo"
 )
 
-func OSCommand(args []string) error {
+func OSCommand(args []string) (string, error) {
 	fs := flag.NewFlagSet("os", flag.ContinueOnError)
 
 	fs.Bool("homedir", false, "Get home directory")
@@ -20,30 +20,30 @@ func OSCommand(args []string) error {
 
 	err := fs.Parse(args[1:])
 	if err != nil {
-		return fmt.Errorf("os: %w", err)
+		return "", fmt.Errorf("os: %w", err)
 	}
 
 	sysInfo := systeminfo.NewLocalSystem()
 
-	flagHandlers := map[string]func() error{
-		"homedir": func() error {
+	flagHandlers := map[string]func() (string, error){
+		"homedir": func() (string, error) {
 			return executeCommand(command.NewHomeDirCommand(sysInfo))
 		},
-		"EOL": func() error {
+		"EOL": func() (string, error) {
 			return executeCommand(command.NewEOLCommand(sysInfo))
 		},
-		"cpus": func() error {
+		"cpus": func() (string, error) {
 			return executeCommand(command.NewCPUsCommand(sysInfo))
 		},
-		"username": func() error {
+		"username": func() (string, error) {
 			return executeCommand(command.NewUsernameCommand(sysInfo))
 		},
-		"architecture": func() error {
+		"architecture": func() (string, error) {
 			return executeCommand(command.NewArchitectureCommand(sysInfo))
 		},
 	}
 
-	var handler func() error
+	var handler func() (string, error)
 	fs.Visit(func(f *flag.Flag) {
 		if h, ok := flagHandlers[f.Name]; ok {
 			handler = h
@@ -54,18 +54,18 @@ func OSCommand(args []string) error {
 		return handler()
 	}
 
-	return fmt.Errorf("os: no flag specified")
+	return "", fmt.Errorf("os: no flag specified")
 }
 
 type ExecutableCmd interface {
 	Execute() (string, error)
 }
 
-func executeCommand(cmd ExecutableCmd) error {
+func executeCommand(cmd ExecutableCmd) (string, error) {
 	info, err := cmd.Execute()
 	if err != nil {
-		return err
+		return "", err
 	}
-	fmt.Print(color.Info(info))
-	return nil
+
+	return fmt.Sprint(color.Info(info)), nil
 }
